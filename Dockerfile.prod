@@ -1,0 +1,16 @@
+FROM node:10.24.1 as build
+
+COPY package.json package-lock.json /var/app/gobarber_web/
+
+WORKDIR /var/app/gobarber_web/
+
+RUN npm install
+
+COPY . /var/app/gobarber_web/
+
+CMD ["npm", "run", "build"]
+
+
+FROM nginx
+
+COPY --from=build /var/app/gobarber_web/build/ /usr/share/nginx/html/

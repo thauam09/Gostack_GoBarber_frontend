@@ -1,23 +1,26 @@
 # a partir da imagem node 10.24.1 (nomeada de build)
 FROM node:10.24.1 as build
 
-# copiar package.json e package-lock.json para o container
-COPY package.json package-lock.json /var/app/gobarber_web/
-
 # definindo diretório de trabalho
-WORKDIR /var/app/gobarber_web/
+WORKDIR /app/gobarber_web/
+
+# copiar package.json e package-lock.json para o container
+COPY package.json package-lock.json ./
 
 # instalando as dependências de projeto
 RUN npm install
 
 # copiando todos os arquivos do projeto
-COPY . /var/app/gobarber_web/
+COPY . .
 
 # rodando o build da aplicação
-CMD ["npm", "run", "build"]
+RUN npm run build
 
 # a partir da versão mais recente do nginx
-FROM nginx
+FROM nginx:latest
+
+# definindo diretório de trabalho
+WORKDIR /usr/share/nginx/html/
 
 # copiar os arquivos estáticos do build para o diretório do servidor html do nginx
-COPY --from=build /var/app/gobarber_web/build/ /usr/share/nginx/html/
+COPY --from=build app/gobarber_web/build/ .
